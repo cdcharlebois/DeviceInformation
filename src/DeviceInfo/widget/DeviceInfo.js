@@ -1,3 +1,7 @@
+/*
+ *  include `cordova-plugin-sim` as window.plugins.sim
+ */
+
 define([
     "dojo/_base/declare",
     "mxui/widget/_WidgetBase",
@@ -16,40 +20,57 @@ define([
     "dojo/_base/event",
 
 
-], function (declare, _WidgetBase, dom, dojoDom, dojoProp, dojoGeometry, dojoClass, dojoStyle, dojoConstruct, dojoArray, lang, dojoText, dojoHtml, dojoEvent) {
+], function(declare, _WidgetBase, dom, dojoDom, dojoProp, dojoGeometry, dojoClass, dojoStyle, dojoConstruct, dojoArray, lang, dojoText, dojoHtml, dojoEvent) {
     "use strict";
 
-    return declare("DeviceInfo.widget.DeviceInfo", [ _WidgetBase ], {
+    return declare("DeviceInfo.widget.DeviceInfo", [_WidgetBase], {
 
 
         // Internal variables.
         _handles: null,
         _contextObj: null,
 
-        constructor: function () {
+        constructor: function() {
             this._handles = [];
         },
 
-        postCreate: function () {
+        postCreate: function() {
             logger.debug(this.id + ".postCreate");
+            console.log("Device ID: " + device.uuid);
+            // make sure the plugin loaded
+            var pluginAvailable = (
+                typeof(window.plugins.sim) !== "undefined"
+            );
+            if (pluginAvailable) {
+                window.plugins.sim.getSimInfo(
+                    function(result) {
+                        console.log(result);
+                    },
+                    function(error) {
+                        console.error(error);
+                    }
+                );
+            } else {
+                console.error("Make sure that the sim plugin is loaded");
+            }
         },
 
-        update: function (obj, callback) {
+        update: function(obj, callback) {
             logger.debug(this.id + ".update");
 
             this._contextObj = obj;
             this._updateRendering(callback);
         },
 
-        resize: function (box) {
-          logger.debug(this.id + ".resize");
+        resize: function(box) {
+            logger.debug(this.id + ".resize");
         },
 
-        uninitialize: function () {
-          logger.debug(this.id + ".uninitialize");
+        uninitialize: function() {
+            logger.debug(this.id + ".uninitialize");
         },
 
-        _updateRendering: function (callback) {
+        _updateRendering: function(callback) {
             logger.debug(this.id + "._updateRendering");
 
             if (this._contextObj !== null) {
@@ -61,10 +82,10 @@ define([
             this._executeCallback(callback);
         },
 
-        _executeCallback: function (cb) {
-          if (cb && typeof cb === "function") {
-            cb();
-          }
+        _executeCallback: function(cb) {
+            if (cb && typeof cb === "function") {
+                cb();
+            }
         }
     });
 });
