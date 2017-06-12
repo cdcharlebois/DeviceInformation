@@ -24,7 +24,10 @@ define([
     "use strict";
 
     return declare("DeviceInfo.widget.DeviceInfo", [_WidgetBase], {
-
+        objectToCreate: null,
+        deviceIdField: null,
+        phoneNumberField: null,
+        microflowToCall: null,
 
         // Internal variables.
         _handles: null,
@@ -35,6 +38,7 @@ define([
         },
 
         postCreate: function() {
+            var self = this;
             logger.debug(this.id + ".postCreate");
             console.log("Device ID: " + device.uuid);
             // make sure the plugin loaded
@@ -42,14 +46,32 @@ define([
                 typeof(window.plugins.sim) !== "undefined"
             );
             if (pluginAvailable) {
-                window.plugins.sim.getSimInfo(
-                    function(result) {
-                        console.log(result);
+                window.plugins.sim.requestReadPermission(
+                    function(success) {
+                        console.log('permission granted')
+                        window.plugins.sim.getSimInfo(
+                            function(result) {
+                                // console.log(result);
+                                self._createObject(true, result)
+                            },
+                            function(error) {
+                                console.error(error);
+                            }
+                        );
                     },
-                    function(error) {
-                        console.error(error);
+                    function(err) {
+                        console.log('no permission')
+                        window.plugins.sim.getSimInfo(
+                            function(result) {
+                                self._createObject(false, result)
+                            },
+                            function(error) {
+                                console.error(error);
+                            }
+                        );
                     }
                 );
+
             } else {
                 console.error("Make sure that the sim plugin is loaded");
             }
@@ -68,6 +90,38 @@ define([
 
         uninitialize: function() {
             logger.debug(this.id + ".uninitialize");
+        },
+
+        _createObject: function(permission, data) {
+            console.log(data)
+                // create object and call microflow
+            mx.data.create({
+                entity: this.objectToCreate,
+                callback: lang.hitch(this, function(obj) {
+                    obj.set(this.deviceIdField, device.uuid);
+                    if (permission) {
+                        obj.set(this.phoneNumberField, data.phoneNumber);
+                    }
+                    this._callMicroflow(this.microflowToCall, obj);
+                }),
+            })
+
+        },
+
+        _callMicroflow: function(mf, param) {
+            mx.data.action({
+                params: {
+                    actionname: mf,
+                    applyto: "selection",
+                    guids: [param.getGuid()]
+                },
+                callback: function(res) {
+                    console.log('success')
+                },
+                error: function(err) {
+                    console.log('error')
+                }
+            })
         },
 
         _updateRendering: function(callback) {

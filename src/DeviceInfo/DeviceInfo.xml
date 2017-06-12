@@ -6,10 +6,32 @@
     <icon />
 
     <properties>
-        <property key="dummyKey" type="string" required="false" defaultValue="">
-            <caption>Dummy key</caption>
-            <category>Appearance</category>
-            <description>This key was added to make the widget work in the Modeler (needs atleast 1 key). Please change/remove this one</description>
+        <property key="objectToCreate" type="entity" required="true" allowNonPersistableEntities="true">
+            <caption>Object to Create</caption>
+            <category>General</category>
+            <description></description>
+        </property>
+        <property key="deviceIdField" type="attribute" required="true" isPath="no" entityProperty="objectToCreate">
+            <caption>Device Id Field</caption>
+            <category>General</category>
+            <description></description>
+            <attributeTypes>
+                <attributeType name="String" />
+            </attributeTypes>
+        </property>
+        <property key="phoneNumberField" type="attribute" required="false" isPath="no" entityProperty="objectToCreate">
+            <caption>Phone Number Field</caption>
+            <category>General</category>
+            <description></description>
+            <attributeTypes>
+                <attributeType name="String" />
+            </attributeTypes>
+        </property>
+        <property key="microflowToCall" type="microflow" required="true" entityProperty="objectToCreate">
+            <caption>Microflow To Call</caption>
+            <category>General</category>
+            <description>Should receive an instance of "Object to Create" as a parameter</description>
+            <returnType type="Void"></returnType>
         </property>
     </properties>
 </widget>
