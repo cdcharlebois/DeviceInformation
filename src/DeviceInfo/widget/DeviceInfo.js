@@ -40,7 +40,7 @@ define([
         postCreate: function() {
             var self = this;
             logger.debug(this.id + ".postCreate");
-            console.log("Device ID: " + device.uuid);
+            // console.log("Device ID: " + device.uuid);
             // make sure the plugin loaded
             var pluginAvailable = (
                 typeof(window.plugins.sim) !== "undefined"
@@ -93,8 +93,8 @@ define([
         },
 
         _createObject: function(permission, data) {
-            console.log(data)
-                // create object and call microflow
+            // console.log(data)
+            // create object and call microflow
             mx.data.create({
                 entity: this.objectToCreate,
                 callback: lang.hitch(this, function(obj) {
